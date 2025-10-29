@@ -1,0 +1,48 @@
+#include <LiquidCrystal.h>
+
+// Updated LCD Pin Configuration: LiquidCrystal(rs, enable, d4, d5, d6, d7)
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
+// Pin Definitions for Other Components
+#define MOISTURE_SENSOR_PIN A0 // Analog pin for soil moisture sensor
+#define RELAY_PIN 3            // Updated: Digital pin 3 for the relay module
+
+// Threshold for moisture level below which the pump should turn on
+const int moistureThreshold = 400;
+
+void setup() {
+  // Initialize the LCD display (16 columns and 2 rows)
+  lcd.begin(16, 2);
+  delay(100);  // Short delay for LCD to initialize
+  lcd.print("   Welcome To");
+  lcd.setCursor(0, 1);               // Move cursor to the second line
+  lcd.print("   HydroGuard");
+  delay(5000);  // Show the initial message for 2 seconds
+
+  // Set up pin modes
+  pinMode(RELAY_PIN, OUTPUT);        // Set relay pin as output
+  digitalWrite(RELAY_PIN, LOW);      // Ensure the pump is off initially
+
+}
+
+void loop() {
+  // Read the soil moisture sensor value
+  int moistureLevel = analogRead(MOISTURE_SENSOR_PIN);
+
+  // Check the moisture level and control the water pump accordingly
+  if (moistureLevel < moistureThreshold) {
+    digitalWrite(RELAY_PIN, HIGH);   // Turn on the pump
+    lcd.setCursor(0, 0);
+    lcd.print("Soil Status:Wet");
+    lcd.setCursor(0, 1);             // Move cursor to the first line
+    lcd.print("Pump: OFF             ");         // Display "Pump: ON"
+  } else {
+    digitalWrite(RELAY_PIN, LOW);    // Turn off the pump
+    lcd.setCursor(0, 0);
+    lcd.print("Soil Status:Dry");
+    lcd.setCursor(0, 1);             // Move cursor to the first line
+    lcd.print("Pump: ON            ");         // Display "Pump: OFF"
+  }
+
+  delay(2000);  // Wait for 2 seconds before the next reading
+}
